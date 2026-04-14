@@ -1,0 +1,28 @@
+{
+  "name": "channelserver",
+  "version": "1.4.0",
+  "description": "WebSocket message relay server for device pairing",
+  "license": "MPL-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@maxmind/geoip2-node": "^5.0.0",
+    "hot-shots": "^10.2.1",
+    "pino": "^9.6.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "@types/ws": "^8.18.0",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

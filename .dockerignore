@@ -1,5 +1,7 @@
-target
-Dockerfile
-.dockerignore
+node_modules
+dist
+*.log
 .git
-.gitignore
+.claude
+test_chan
+docs

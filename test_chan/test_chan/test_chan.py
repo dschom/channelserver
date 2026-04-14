@@ -184,7 +184,7 @@ class TestService(unittest.TestCase):
 
     def test_max_exchange(self):
         (alice, bob) = self.get_connection()
-        max_exchange = self.opts.max_exchange
+        max_exchange = int(self.opts.max_exchanges)
         for i in range(0, max_exchange+1):
             message = "This is message #{}".format(i)
             alice.send(message)

@@ -1,40 +1,21 @@
-# Docker 17.05 or higher required for multi-stage builds
-# RUST_VER
-FROM rust:1.86-bookworm AS builder
-ADD . /app
+FROM node:22-slim AS builder
 WORKDIR /app
-# Make sure that this matches in .travis.yml
-ARG RUST_TOOLCHAIN=stable
-RUN \
-    apt-get -qq update && \
-    \
-    rustup default ${RUST_TOOLCHAIN} && \
-    cargo --version && \
-    rustc --version && \
-    mkdir -m 755 bin && \
-    cargo build --release && \
-    cp /app/target/release/channelserver /app/bin
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+COPY tsconfig.json ./
+COPY src/ src/
+RUN npx tsc
 
-FROM debian:bookworm-slim
-# FROM debian:buster  # for debugging docker build
-RUN \
-    groupadd --gid 10001 app && \
-    useradd --uid 10001 --gid 10001 --home /app --create-home app && \
-    \
-    apt-get -qq update && \
-    apt-get -qq install -y libssl-dev ca-certificates && \
-    update-ca-certificates && \
-    rm -rf /var/lib/apt/lists
-
-COPY --from=builder /app/bin /app/bin
-COPY --from=builder /app/version.json /app
-COPY --from=builder /app/mmdb /app/mmdb
-
+FROM node:22-slim
+RUN groupadd --gid 10001 app && \
+    useradd --uid 10001 --gid 10001 --home /app --create-home app
 WORKDIR /app
+COPY --from=builder /app/package.json /app/package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts
+COPY --from=builder /app/dist/ dist/
+COPY --from=builder /app/node_modules/ node_modules/
+COPY version.json ./
+COPY mmdb/ mmdb/
+
 USER app
-
-# Channelserver Uses ports: 8000
-# override rocket's dev env defaulting to localhost
-#ENV ROCKET_ADDRESS 0.0.0.0
-
-CMD ["/app/bin/channelserver"]
+CMD ["node", "dist/index.js"]

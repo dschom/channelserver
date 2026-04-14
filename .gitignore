@@ -1,7 +1,8 @@
 .idea/
 .vscode/
-target/
-spake2_demo/target
+node_modules/
+dist/
+*.log
 test_chan/bin/
 test_chan/include/
 test_chan/lib/
